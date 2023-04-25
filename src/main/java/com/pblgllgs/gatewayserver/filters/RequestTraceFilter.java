@@ -14,9 +14,9 @@ import reactor.core.publisher.Mono;
 
 @Order(1)
 @Component
-public class TraceFilter implements GlobalFilter {
+public class RequestTraceFilter implements GlobalFilter {
 
-    private static final Logger logger = LoggerFactory.getLogger(TraceFilter.class);
+    private static final Logger logger = LoggerFactory.getLogger(RequestTraceFilter.class);
 
     @Autowired
     FilterUtility filterUtility;
@@ -25,12 +25,12 @@ public class TraceFilter implements GlobalFilter {
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         HttpHeaders requestHeaders = exchange.getRequest().getHeaders();
         if (isCorrelationIdPresent(requestHeaders)) {
-            logger.debug("pblgllgs-correlation-id found in tracing filter: {}. ",
+            logger.debug("Pblgllgs-correlation-id found in tracing filter: {}. ",
                     filterUtility.getCorrelationId(requestHeaders));
         } else {
             String correlationID = generateCorrelationId();
             exchange = filterUtility.setCorrelationId(exchange, correlationID);
-            logger.debug("pblgllgs-correlation-id generated in tracing filter: {}.", correlationID);
+            logger.debug("Pblgllgs-correlation-id generated in tracing filter: {}.", correlationID);
         }
         return chain.filter(exchange);
     }
@@ -46,4 +46,5 @@ public class TraceFilter implements GlobalFilter {
     private String generateCorrelationId() {
         return java.util.UUID.randomUUID().toString();
     }
+
 }
